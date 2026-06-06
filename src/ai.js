@@ -18,9 +18,25 @@ function extractJSON(str) {
 }
 
 async function ask(prompt) {
-  if (!hasClaude()) return null;
-  try { return await window.claude.complete(prompt); }
-  catch (e) { console.warn("Claude API indisponible, fallback local:", e); return null; }
+  // Claude.ai native proxy (used when running inside Claude artifacts)
+  if (hasClaude()) {
+    try { return await window.claude.complete(prompt); }
+    catch (e) { console.warn("Claude proxy error:", e); }
+  }
+  // Vercel serverless proxy (production deployment)
+  try {
+    const res = await fetch("/api/claude", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    return data.text ?? null;
+  } catch (e) {
+    console.warn("API indisponible, fallback local:", e.message);
+    return null;
+  }
 }
 
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
