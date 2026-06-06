@@ -1,0 +1,9 @@
+{
+  "name": "toppronoelite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TPE — Top Prono Élite · Pronostics Coupe du Monde 2026",
+  "engines": {
+    "node": ">=18"
+  }
+}
