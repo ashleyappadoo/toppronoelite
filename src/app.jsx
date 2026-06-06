@@ -1,4 +1,4 @@
-/* global React, ReactDOM, Store, MATCHES, uuid, genLeagueCode, ensureAdmin,
+/* global React, ReactDOM, Store, MATCHES, uuid, genLeagueCode, ensureAdmin, initStorage,
    aiOraculoProno, aiDebrief, aiPreMatch, aiWrapped, scoreProno, resultFor, leagueStandings,
    AuthView, DashboardView, LeaguesView, LeagueView, MatchView, AdminView, WrappedView, MatchesView, ProfileView,
    StatusBar, BottomNav, Toast */
@@ -17,8 +17,20 @@ function App() {
   const refresh = React.useCallback(() => setVersion((v) => v + 1), []);
   const toast = React.useCallback((m) => { setToastMsg(m); clearTimeout(window.__t); window.__t = setTimeout(() => setToastMsg(""), 2400); }, []);
 
-  // boot
-  React.useEffect(() => { (async () => { await ensureAdmin(); setSession(Store.session()); setReady(true); })(); }, []);
+  // boot : init Supabase (ou localStorage fallback) puis seed admin
+  React.useEffect(() => {
+    (async () => {
+      await initStorage();
+      await ensureAdmin();
+      setSession(Store.session());
+      setReady(true);
+    })();
+  }, []);
+  // sync Supabase toutes les 30s pour avoir les données fraîches des autres joueurs
+  React.useEffect(() => {
+    const id = setInterval(() => Store.sync().then(refresh).catch(console.warn), 30000);
+    return () => clearInterval(id);
+  }, []);
   // horloge temps réel (countdowns / statuts)
   React.useEffect(() => { const id = setInterval(() => setTick((t) => t + 1), 1000); return () => clearInterval(id); }, []);
 

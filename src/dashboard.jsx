@@ -54,7 +54,8 @@ function DashboardView({ session, go, tick, toast }) {
           <div style={{ fontSize: 13, color: "var(--mut)", fontWeight: 600 }}>Salut,</div>
           <div className="disp" style={{ fontSize: 30, letterSpacing: 1 }}>{session.pseudo}</div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {Store.isOnline() ? <span className="chip chip-green" style={{ fontSize: 9 }}>🌐 Multi</span> : <span className="chip chip-mut" style={{ fontSize: 9 }}>💾 Local</span>}
           {session.role === "admin" && <button onClick={() => go("admin")} className="chip chip-red" style={{ cursor: "pointer", border: "none" }}>ADMIN</button>}
           <button onClick={() => go("logout")} style={{ background: "var(--surf-2)", border: "1px solid var(--line)", borderRadius: 10, width: 38, height: 38, display: "grid", placeItems: "center", color: "var(--mut)", cursor: "pointer" }}><ILogout style={{ width: 18, height: 18 }} /></button>
         </div>
